@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">ScentCast</string>
+    <string name="back">Back</string>
+    <string name="no_app">No app found to handle this action.</string>
+
+    <!-- Today's pick -->
+    <string name="home_title">Today\'s pick</string>
+    <string name="home_weather_label">What is it like outside?</string>
+    <string name="weather_cold">Cold</string>
+    <string name="weather_mild">Mild</string>
+    <string name="weather_hot">Hot</string>
+    <string name="reason_cold">Cold or damp out there, so something warm and spicy will hold up.</string>
+    <string name="reason_mild">Mild and dry, so something smooth and balanced works well.</string>
+    <string name="reason_hot">Hot out there, so keep it light, fresh and citrusy.</string>
+    <string name="pick_none">Nothing in your collection suits this weather yet. Add a bottle first.</string>
+    <string name="btn_another">Another pick</string>
+    <string name="btn_share">Share</string>
+    <string name="btn_shops">Find shops</string>
+    <string name="btn_collection">My collection</string>
+    <string name="share_text">Today I\'m wearing %1$s by %2$s, picked by ScentCast.</string>
+    <string name="shops_query">perfume shops near me</string>
+
+    <!-- Collection -->
+    <string name="collection_title">My collection</string>
+    <string name="collection_empty">Nothing here yet. Tap + to add a bottle.</string>
+    <string name="filter_all">All</string>
+    <string name="scent_fresh">Fresh</string>
+    <string name="scent_woody">Woody</string>
+    <string name="scent_sweet">Sweet</string>
+    <string name="scent_spicy">Spicy</string>
+
+    <!-- Add / edit -->
+    <string name="add_perfume">Add perfume</string>
+    <string name="edit_perfume">Edit perfume</string>
+    <string name="field_name">Name</string>
+    <string name="field_brand">Brand</string>
+    <string name="label_scent_type">Scent type</string>
+    <string name="label_suits">Suits weather</string>
+    <string name="no_photo">No photo yet</string>
+    <string name="btn_take_photo">Take photo</string>
+    <string name="btn_gallery">Choose photo</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_delete">Delete</string>
+    <string name="toast_saved">Saved</string>
+    <string name="toast_deleted">Deleted</string>
+</resources>
