@@ -44,9 +44,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -55,6 +57,8 @@ import com.example.scentcast.ui.theme.ScentCastTheme
 /** Screen 3: Add / Edit Perfume. Edit mode is chosen by an extra on the explicit intent. */
 class AddPerfumeActivity : LoggedActivity() {
 
+    // Key for the perfume id passed on the explicit intent from CollectionActivity.
+    // It starts with the package name so it cannot clash with another app's extras.
     companion object {
         const val EXTRA_PERFUME_ID = "com.example.scentcast.PERFUME_ID"
     }
@@ -75,11 +79,17 @@ class AddPerfumeActivity : LoggedActivity() {
     }
 }
 
+/**
+ * Layout 3 of 3: a scrolling form with a picture area, text fields, radio buttons and chips.
+ *  is the perfume being edited, or null when adding a new one.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
     val context = LocalContext.current
 
+    // Form state. It starts from the existing perfume in edit mode, or from defaults
+    // in add mode, and rememberSaveable keeps what the user typed across rotation.
     var name by rememberSaveable { mutableStateOf(existing?.name ?: "") }
     var brand by rememberSaveable { mutableStateOf(existing?.brand ?: "") }
     var scent by rememberSaveable { mutableStateOf(existing?.scentType ?: ScentType.FRESH) }
@@ -144,6 +154,18 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxWidth().height(180.dp)
                     )
+                } else if (existing?.imageRes != null) {
+                    // No photo of its own yet, so show the bundled picture.
+                    Image(
+                        painter = painterResource(existing.imageRes),
+                        contentDescription = name,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .background(Color.White)
+                            .padding(8.dp)
+                    )
                 } else {
                     Text(
                         text = stringResource(R.string.no_photo),
@@ -179,6 +201,7 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                 }
             }
 
+            // User interaction: text input. Each field writes straight into its state variable.
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -198,6 +221,8 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                 text = stringResource(R.string.label_scent_type),
                 style = MaterialTheme.typography.titleSmall
             )
+            // One radio button per scent type. The whole row is selectable, not just the
+            // small circle, which gives a bigger touch target and works with TalkBack.
             ScentType.entries.forEach { type ->
                 Row(
                     modifier = Modifier
@@ -231,6 +256,9 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                 }
             }
 
+            // Save: builds a Perfume from the form and stores it. An existing perfume keeps
+            // its id, so save() replaces it; a new one gets a fresh id and is added.
+            // The button is disabled until a name is typed (simple input validation).
             Button(
                 onClick = {
                     PerfumeRepository.save(
@@ -240,7 +268,8 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                             brand = brand.trim(),
                             scentType = scent,
                             weather = weather,
-                            photo = photo
+                            photo = photo,
+                            imageRes = existing?.imageRes
                         )
                     )
                     Toast.makeText(context, R.string.toast_saved, Toast.LENGTH_SHORT).show()
@@ -252,6 +281,7 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                 Text(stringResource(R.string.btn_save))
             }
 
+            // Delete only makes sense for a perfume that already exists, so it is hidden in add mode.
             if (existing != null) {
                 OutlinedButton(
                     onClick = {
@@ -268,12 +298,27 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
     }
 }
 
-/** Decodes a gallery image at a quarter of its size so it stays small in memory. */
+/** Longest side, in pixels, a gallery photo is scaled down to. */
+private const val MAX_PHOTO_SIDE = 1024
+
+/**
+ * Decodes a gallery image, shrinking it only when it is bigger than [MAX_PHOTO_SIDE]
+ * so large photos stay small in memory and small ones stay sharp.
+ */
 private fun loadBitmap(context: Context, uri: Uri): Bitmap? = try {
     val source = ImageDecoder.createSource(context.contentResolver, uri)
-    ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+    ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
         decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-        decoder.setTargetSampleSize(4)
+        val width = info.size.width
+        val height = info.size.height
+        val longest = maxOf(width, height)
+        if (longest > MAX_PHOTO_SIDE) {
+            val scale = MAX_PHOTO_SIDE.toFloat() / longest
+            decoder.setTargetSize(
+                (width * scale).toInt().coerceAtLeast(1),
+                (height * scale).toInt().coerceAtLeast(1)
+            )
+        }
     }
 } catch (e: Exception) {
     null
