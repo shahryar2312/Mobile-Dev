@@ -103,7 +103,7 @@ object PerfumeRepository {
 
     // ---- Wear diary ----
 
-    fun logWear(perfume: Perfume, tempC: Double?, time: TimeOfDay) {
+    fun logWear(perfume: Perfume, tempC: Double?, time: TimeOfDay): WearLog {
         val log = WearLog(
             id = nextWearId++,
             perfumeId = perfume.id,
@@ -115,6 +115,7 @@ object PerfumeRepository {
             sprays = Settings.spraysPerWear
         )
         wears.add(0, log) // newest first
+        return log
     }
 
     fun rateWear(id: Int, rating: Int) {

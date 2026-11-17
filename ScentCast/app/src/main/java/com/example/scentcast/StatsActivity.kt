@@ -20,9 +20,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -149,6 +151,27 @@ fun StatsScreen(onBack: () -> Unit) {
                 ThemeChip(context, Settings.THEME_SYSTEM, R.string.theme_system)
                 ThemeChip(context, Settings.THEME_LIGHT, R.string.theme_light)
                 ThemeChip(context, Settings.THEME_DARK, R.string.theme_dark)
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.settings_reminders),
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = Settings.remindersOn,
+                    onCheckedChange = { Settings.saveRemindersOn(context, it) }
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.settings_demo),
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = Settings.demoReminders,
+                    onCheckedChange = { Settings.saveDemoReminders(context, it) }
+                )
             }
 
             Text(stringResource(R.string.settings_sprays), style = MaterialTheme.typography.titleSmall)

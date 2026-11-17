@@ -8,11 +8,15 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.core.content.ContextCompat
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -184,6 +188,9 @@ private const val BRIGHT_ABOVE_LUX = 80f
 @Composable
 fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeather: () -> Unit) {
     val context = LocalContext.current
+    val notificationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
 
     var weather by rememberSaveable { mutableStateOf(Weather.MILD) }
     var timeOfDay by rememberSaveable { mutableStateOf(timeOfDayFromClock()) }
@@ -345,8 +352,17 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
             FilledTonalButton(
                 onClick = {
                     if (pick != null) {
-                        PerfumeRepository.logWear(pick, state.reading?.tempC, timeOfDay)
+                        val wear = PerfumeRepository.logWear(pick, state.reading?.tempC, timeOfDay)
                         Toast.makeText(context, R.string.toast_logged, Toast.LENGTH_SHORT).show()
+                        if (Settings.remindersOn) {
+                            Reminders.schedule(context, wear)
+                            // Android 13+ needs the user's OK before notifications can show.
+                            val needsAsk = Build.VERSION.SDK_INT >= 33 &&
+                                ContextCompat.checkSelfPermission(
+                                    context, Manifest.permission.POST_NOTIFICATIONS
+                                ) != PackageManager.PERMISSION_GRANTED
+                            if (needsAsk) notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
                     }
                 },
                 enabled = pick != null,

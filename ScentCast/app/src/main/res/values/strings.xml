@@ -65,6 +65,11 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="settings_sprays">Sprays per wear (about 0.1 ml each)</string>
+    <string name="settings_reminders">Rating reminders (1, 3 and 6 hours after a wear)</string>
+    <string name="settings_demo">Demo mode: minutes instead of hours</string>
+    <string name="channel_name">Longevity reminders</string>
+    <string name="reminder_title">How strong is %1$s now?</string>
+    <string name="reminder_text">%1$d hour(s) after you put it on. Tap to rate it from 1 to 5.</string>
     <string name="field_size">Bottle size (ml)</string>
 
     <!-- Collection -->
