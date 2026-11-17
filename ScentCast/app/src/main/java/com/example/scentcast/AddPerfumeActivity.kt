@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -84,6 +86,7 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
     var brand by rememberSaveable { mutableStateOf(existing?.brand ?: "") }
     var scent by rememberSaveable { mutableStateOf(existing?.scentType ?: ScentType.FRESH) }
     var weather by rememberSaveable { mutableStateOf(existing?.weather ?: Weather.MILD) }
+    var size by rememberSaveable { mutableStateOf((existing?.sizeMl ?: 100).toString()) }
     // Bitmaps are too big to save in the instance state, so the photo resets on rotation.
     var photo by remember { mutableStateOf(existing?.photo) }
 
@@ -194,6 +197,15 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
 
+            OutlinedTextField(
+                value = size,
+                onValueChange = { size = it.filter { c -> c.isDigit() }.take(4) },
+                label = { Text(stringResource(R.string.field_size)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Text(
                 text = stringResource(R.string.label_scent_type),
                 style = MaterialTheme.typography.titleSmall
@@ -240,7 +252,8 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                             brand = brand.trim(),
                             scentType = scent,
                             weather = weather,
-                            photo = photo
+                            photo = photo,
+                            sizeMl = (size.toIntOrNull() ?: 100).coerceAtLeast(1)
                         )
                     )
                     Toast.makeText(context, R.string.toast_saved, Toast.LENGTH_SHORT).show()

@@ -20,6 +20,53 @@
     <string name="share_text">Today I\'m wearing %1$s by %2$s, picked by ScentCast.</string>
     <string name="shops_query">perfume shops near me</string>
 
+    <!-- Sensors (Milestone 2) -->
+    <string name="sensors_title">Live sensors</string>
+    <string name="btn_live_weather">Use my location</string>
+    <string name="live_loading">Getting your location and the weather…</string>
+    <string name="live_weather">Weather: %1$.1f°C, %2$d%% humidity (Open-Meteo)</string>
+    <string name="live_position">Position: %1$.2f, %2$.2f</string>
+    <string name="live_none">Weather: not read yet, choose it by hand below.</string>
+    <string name="light_value">Light: %1$d lx, so it is %2$s</string>
+    <string name="light_none">Light sensor not available, using the clock instead (%1$s).</string>
+    <string name="tod_day">daytime</string>
+    <string name="tod_night">night-time</string>
+    <string name="shake_hint">Shake the phone for a different pick.</string>
+    <string name="shake_count">Shakes detected: %1$d</string>
+    <string name="reason_day">It is bright, so a daytime scent is preferred.</string>
+    <string name="reason_night">It is dark, so an evening scent is preferred.</string>
+    <string name="err_no_permission">Location permission was denied, so choose the weather by hand.</string>
+    <string name="err_no_location">Could not get a location. Turn on location, or choose the weather by hand.</string>
+    <string name="err_network">Could not reach Open-Meteo. Check your connection, or choose the weather by hand.</string>
+
+    <!-- Wear diary -->
+    <string name="btn_wore">I wore this</string>
+    <string name="btn_diary">Wear diary</string>
+    <string name="toast_logged">Logged in your diary</string>
+    <string name="diary_title">Wear diary</string>
+    <string name="diary_empty">No wears yet. Tap \"I wore this\" on the home screen.</string>
+    <string name="diary_temp">%1$.1f°C</string>
+    <string name="diary_rate_prompt">How strong does it smell now? (1 faded, 5 strong)</string>
+
+    <string name="diary_sprays">%1$d sprays</string>
+
+    <!-- Stats and settings -->
+    <string name="btn_stats">Stats &amp; settings</string>
+    <string name="stats_title">Stats &amp; settings</string>
+    <string name="stats_heading">Stats</string>
+    <string name="stats_no_wears">Nothing worn yet. Log a wear on the home screen.</string>
+    <string name="stats_most">Most worn: %1$s (%2$d)</string>
+    <string name="stats_least">Least worn: %1$s (%2$d)</string>
+    <string name="stats_not_rated">not rated</string>
+    <string name="stats_row">%1$d wears · longevity %2$s · about %3$.1f of %4$d ml left</string>
+    <string name="settings_heading">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_sprays">Sprays per wear (about 0.1 ml each)</string>
+    <string name="field_size">Bottle size (ml)</string>
+
     <!-- Collection -->
     <string name="collection_title">My collection</string>
     <string name="collection_empty">Nothing here yet. Tap + to add a bottle.</string>

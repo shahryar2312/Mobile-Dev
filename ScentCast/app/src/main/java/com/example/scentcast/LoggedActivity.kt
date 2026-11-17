@@ -19,6 +19,7 @@ open class LoggedActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Settings.load(this) // theme and spray count, before any screen draws
         log("onCreate")
     }
 
