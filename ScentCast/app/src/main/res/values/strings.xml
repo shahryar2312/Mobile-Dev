@@ -39,6 +39,47 @@
     <string name="err_no_location">Could not get a location. Turn on location, or choose the weather by hand.</string>
     <string name="err_network">Could not reach Open-Meteo. Check your connection, or choose the weather by hand.</string>
 
+    <!-- Seasons -->
+    <string name="season_spring">Spring</string>
+    <string name="season_summer">Summer</string>
+    <string name="season_autumn">Autumn</string>
+    <string name="season_winter">Winter</string>
+    <string name="season_value">Season: %1$s (from today\'s date)</string>
+
+    <!-- Budget mode -->
+    <string name="budget_switch">Budget mode (cheaper alternatives)</string>
+    <string name="budget_label">Budget pick</string>
+    <string name="price_about">about €%1$d</string>
+    <string name="budget_similar">Similar in style to %1$s by %2$s. Not an exact copy.</string>
+    <string name="budget_none">No budget option saved for this one.</string>
+    <string name="btn_details">Notes, chart and where to buy</string>
+
+    <!-- Perfume details -->
+    <string name="detail_notes">Notes</string>
+    <string name="detail_no_notes">No notes yet. Tap Edit perfume to add them.</string>
+    <string name="notes_top">Top</string>
+    <string name="notes_heart">Heart</string>
+    <string name="notes_base">Base</string>
+    <string name="detail_accords">Main accords</string>
+    <string name="detail_when">When to wear it</string>
+    <string name="detail_best_time">Best time: %1$s</string>
+    <string name="time_any">any time</string>
+    <string name="detail_seasons">Seasons: %1$s</string>
+    <string name="detail_weather">Weather: %1$s</string>
+    <string name="detail_how">How to use it</string>
+    <string name="detail_do">Do: %1$s</string>
+    <string name="detail_dont">Don\'t: %1$s</string>
+    <string name="detail_budget">Budget alternative</string>
+    <string name="detail_price_compare">About €%1$d, against about €%2$d for the original</string>
+    <string name="detail_price">About €%1$d</string>
+    <string name="detail_dupe_note">Similar style, not an exact copy. Prices are rough estimates, so check before buying.</string>
+    <string name="btn_find_perfume">Find this perfume in shops</string>
+    <string name="btn_find_dupe">Find the budget option in shops</string>
+    <string name="label_notes_hint">Comma separated, for example: Bergamot, Pepper</string>
+    <string name="field_top_notes">Top notes</string>
+    <string name="field_heart_notes">Heart notes</string>
+    <string name="field_base_notes">Base notes</string>
+
     <!-- Wear diary -->
     <string name="btn_wore">I wore this</string>
     <string name="btn_diary">Wear diary</string>

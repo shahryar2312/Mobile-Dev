@@ -134,10 +134,10 @@ fun CollectionScreen(onBack: () -> Unit) {
                 ) {
                     items(shown, key = Perfume::id) { perfume ->
                         PerfumeCard(perfume) {
-                            // Explicit intent with data: open the form in "edit" mode.
-                            val edit = Intent(context, AddPerfumeActivity::class.java)
-                                .putExtra(AddPerfumeActivity.EXTRA_PERFUME_ID, perfume.id)
-                            context.startActivity(edit)
+                            // Explicit intent with data: open this perfume's details page.
+                            val details = Intent(context, PerfumeDetailActivity::class.java)
+                                .putExtra(PerfumeDetailActivity.EXTRA_PERFUME_ID, perfume.id)
+                            context.startActivity(details)
                         }
                     }
                 }

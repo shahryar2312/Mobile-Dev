@@ -14,12 +14,23 @@ enum class ScentType(val labelRes: Int, val bestAt: TimeOfDay?) {
     SPICY(R.string.scent_spicy, TimeOfDay.NIGHT)
 }
 
-/** Simple weather groups, filled from Open-Meteo (GPS) or chosen by hand. */
-enum class Weather(val labelRes: Int, val reasonRes: Int) {
-    COLD(R.string.weather_cold, R.string.reason_cold),
-    MILD(R.string.weather_mild, R.string.reason_mild),
-    HOT(R.string.weather_hot, R.string.reason_hot)
+/** Taken from today's date. */
+enum class Season(val labelRes: Int) {
+    SPRING(R.string.season_spring),
+    SUMMER(R.string.season_summer),
+    AUTUMN(R.string.season_autumn),
+    WINTER(R.string.season_winter)
 }
+
+/** Simple weather groups, filled from Open-Meteo (GPS) or chosen by hand. */
+enum class Weather(val labelRes: Int, val reasonRes: Int, val defaultSeasons: Set<Season>) {
+    COLD(R.string.weather_cold, R.string.reason_cold, setOf(Season.AUTUMN, Season.WINTER)),
+    MILD(R.string.weather_mild, R.string.reason_mild, setOf(Season.SPRING, Season.AUTUMN)),
+    HOT(R.string.weather_hot, R.string.reason_hot, setOf(Season.SUMMER, Season.SPRING))
+}
+
+/** A cheaper perfume with a similar style. Prices are rough, in euro. */
+data class Dupe(val name: String, val brand: String, val priceEur: Int)
 
 data class Perfume(
     val id: Int,
@@ -28,7 +39,17 @@ data class Perfume(
     val scentType: ScentType,
     val weather: Weather,
     val photo: Bitmap? = null,
-    val sizeMl: Int = 100
+    val sizeMl: Int = 100,
+    val seasons: Set<Season> = weather.defaultSeasons,
+    // Notes are comma separated text, so they are easy to type on the form.
+    val topNotes: String = "",
+    val heartNotes: String = "",
+    val baseNotes: String = "",
+    val accords: List<Pair<String, Int>> = emptyList(), // name and strength 0 to 100
+    val howToWear: String = "",
+    val avoidWhen: String = "",
+    val priceEur: Int? = null,
+    val dupe: Dupe? = null
 )
 
 /** One time you wore a perfume. tempC comes from the GPS weather reading, if there was one. */
@@ -50,14 +71,7 @@ data class WearLog(
  */
 object PerfumeRepository {
 
-    val perfumes = mutableStateListOf(
-        Perfume(1, "Sauvage", "Dior", ScentType.SPICY, Weather.COLD),
-        Perfume(2, "Spicebomb", "Viktor & Rolf", ScentType.SPICY, Weather.COLD),
-        Perfume(3, "Bleu de Chanel", "Chanel", ScentType.WOODY, Weather.MILD),
-        Perfume(4, "1 Million", "Paco Rabanne", ScentType.SWEET, Weather.MILD),
-        Perfume(5, "Acqua di Gio", "Armani", ScentType.FRESH, Weather.HOT),
-        Perfume(6, "Light Blue", "Dolce & Gabbana", ScentType.FRESH, Weather.HOT)
-    )
+    val perfumes = mutableStateListOf<Perfume>().apply { addAll(starterPerfumes) }
 
     val wears = mutableStateListOf<WearLog>()
 
@@ -91,14 +105,30 @@ object PerfumeRepository {
     }
 
     /**
-     * Picks a random perfume for the weather. It prefers ones that also suit the time of
-     * day, and avoids skipId (the current pick) when there is a choice.
+     * Picks a random perfume for the weather. Among those, it prefers ones that suit the
+     * time of day, then the season, and avoids skipId (the current pick) when there is a choice.
      */
-    fun suggestFor(weather: Weather, time: TimeOfDay, skipId: Int? = null): Perfume? {
+    fun suggestFor(
+        weather: Weather,
+        time: TimeOfDay,
+        season: Season? = null,
+        skipId: Int? = null
+    ): Perfume? {
         val matches = perfumes.filter { it.weather == weather }
-        val best = matches.filter { fitsTime(it, time) }.ifEmpty { matches }
+        val byTime = matches.filter { fitsTime(it, time) }.ifEmpty { matches }
+        val best = byTime.filter { season == null || season in it.seasons }.ifEmpty { byTime }
         val pool = best.filter { it.id != skipId }.ifEmpty { best }
         return pool.randomOrNull()
+    }
+
+    /** The season for a date, using the usual meteorological months (Dec to Feb is winter). */
+    fun currentSeason(): Season {
+        return when (java.util.Calendar.getInstance().get(java.util.Calendar.MONTH)) {
+            java.util.Calendar.MARCH, java.util.Calendar.APRIL, java.util.Calendar.MAY -> Season.SPRING
+            java.util.Calendar.JUNE, java.util.Calendar.JULY, java.util.Calendar.AUGUST -> Season.SUMMER
+            java.util.Calendar.SEPTEMBER, java.util.Calendar.OCTOBER, java.util.Calendar.NOVEMBER -> Season.AUTUMN
+            else -> Season.WINTER
+        }
     }
 
     // ---- Wear diary ----

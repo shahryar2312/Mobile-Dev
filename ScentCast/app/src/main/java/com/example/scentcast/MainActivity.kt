@@ -33,8 +33,11 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -196,6 +199,10 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
     var timeOfDay by rememberSaveable { mutableStateOf(timeOfDayFromClock()) }
     var pickId by rememberSaveable { mutableStateOf<Int?>(null) }
     val pick = pickId?.let { PerfumeRepository.get(it) }
+    var budget by rememberSaveable { mutableStateOf(false) }
+    val season = remember { PerfumeRepository.currentSeason() }
+    // In budget mode the card shows the cheaper alternative, when the pick has one.
+    val dupe = if (budget) pick?.dupe else null
 
     // New GPS weather: use it as the weather for the suggestion.
     LaunchedEffect(state.reading) {
@@ -214,14 +221,14 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
     // Weather or time of day changed: pick again only if the current pick no longer fits.
     LaunchedEffect(weather, timeOfDay) {
         if (pick == null || !PerfumeRepository.isGoodFor(pick, weather, timeOfDay)) {
-            pickId = PerfumeRepository.suggestFor(weather, timeOfDay)?.id
+            pickId = PerfumeRepository.suggestFor(weather, timeOfDay, season)?.id
         }
     }
 
     // Each shake gives another pick.
     LaunchedEffect(state.shakes) {
         if (state.shakes > 0) {
-            pickId = PerfumeRepository.suggestFor(weather, timeOfDay, skipId = pickId)?.id
+            pickId = PerfumeRepository.suggestFor(weather, timeOfDay, season, skipId = pickId)?.id
         }
     }
 
@@ -280,6 +287,7 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
                         Text(stringResource(R.string.light_none, timeLabel))
                     }
 
+                    Text(stringResource(R.string.season_value, stringResource(season.labelRes)))
                     Text(stringResource(R.string.shake_count, state.shakes))
                     Text(
                         text = stringResource(R.string.shake_hint),
@@ -312,17 +320,53 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
                 }
             }
 
+            // Budget option: swaps the pick for a cheaper perfume in a similar style.
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.budget_switch),
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(checked = budget, onCheckedChange = { budget = it })
+            }
+
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (pick != null) {
-                        Text(text = pick.name, style = MaterialTheme.typography.headlineSmall)
-                        Text(
-                            text = "${pick.brand} · ${stringResource(pick.scentType.labelRes)}",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                    if (pick == null) {
+                        Text(text = stringResource(R.string.pick_none))
+                    } else {
+                        if (dupe != null) {
+                            Text(
+                                text = stringResource(R.string.budget_label),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                            Text(text = dupe.name, style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                text = "${dupe.brand} · " +
+                                    stringResource(R.string.price_about, dupe.priceEur),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = stringResource(R.string.budget_similar, pick.name, pick.brand),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        } else {
+                            Text(text = pick.name, style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                text = "${pick.brand} · ${stringResource(pick.scentType.labelRes)}",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            if (budget) {
+                                Text(
+                                    text = stringResource(R.string.budget_none),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+
+                        // The weather and time reasons apply to either perfume.
                         Text(
                             text = stringResource(weather.reasonRes),
                             style = MaterialTheme.typography.bodyMedium
@@ -333,15 +377,27 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
                             text = stringResource(timeReason),
                             style = MaterialTheme.typography.bodyMedium
                         )
-                    } else {
-                        Text(text = stringResource(R.string.pick_none))
                     }
+                }
+            }
+
+            if (pick != null) {
+                // Explicit intent with an extra: opens the notes, accords chart and maps page.
+                OutlinedButton(
+                    onClick = {
+                        val details = Intent(context, PerfumeDetailActivity::class.java)
+                            .putExtra(PerfumeDetailActivity.EXTRA_PERFUME_ID, pick.id)
+                        context.startActivity(details)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.btn_details))
                 }
             }
 
             Button(
                 onClick = {
-                    pickId = PerfumeRepository.suggestFor(weather, timeOfDay, skipId = pickId)?.id
+                    pickId = PerfumeRepository.suggestFor(weather, timeOfDay, season, skipId = pickId)?.id
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -365,7 +421,8 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
                         }
                     }
                 },
-                enabled = pick != null,
+                // In budget mode the shown perfume is not in your collection, so no logging.
+                enabled = pick != null && dupe == null,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.btn_wore))

@@ -86,6 +86,9 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
     var brand by rememberSaveable { mutableStateOf(existing?.brand ?: "") }
     var scent by rememberSaveable { mutableStateOf(existing?.scentType ?: ScentType.FRESH) }
     var weather by rememberSaveable { mutableStateOf(existing?.weather ?: Weather.MILD) }
+    var topNotes by rememberSaveable { mutableStateOf(existing?.topNotes ?: "") }
+    var heartNotes by rememberSaveable { mutableStateOf(existing?.heartNotes ?: "") }
+    var baseNotes by rememberSaveable { mutableStateOf(existing?.baseNotes ?: "") }
     var size by rememberSaveable { mutableStateOf((existing?.sizeMl ?: 100).toString()) }
     // Bitmaps are too big to save in the instance state, so the photo resets on rotation.
     var photo by remember { mutableStateOf(existing?.photo) }
@@ -197,6 +200,28 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Text(
+                text = stringResource(R.string.label_notes_hint),
+                style = MaterialTheme.typography.bodySmall
+            )
+            OutlinedTextField(
+                value = topNotes,
+                onValueChange = { topNotes = it },
+                label = { Text(stringResource(R.string.field_top_notes)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = heartNotes,
+                onValueChange = { heartNotes = it },
+                label = { Text(stringResource(R.string.field_heart_notes)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = baseNotes,
+                onValueChange = { baseNotes = it },
+                label = { Text(stringResource(R.string.field_base_notes)) },
+                modifier = Modifier.fillMaxWidth()
+            )
             OutlinedTextField(
                 value = size,
                 onValueChange = { size = it.filter { c -> c.isDigit() }.take(4) },
@@ -245,15 +270,25 @@ fun AddPerfumeScreen(existing: Perfume?, onDone: () -> Unit) {
 
             Button(
                 onClick = {
+                    // copy() keeps the details the form does not show (accords, dupe, tips...).
+                    val start = existing ?: Perfume(
+                        id = PerfumeRepository.newId(),
+                        name = "",
+                        brand = "",
+                        scentType = scent,
+                        weather = weather
+                    )
                     PerfumeRepository.save(
-                        Perfume(
-                            id = existing?.id ?: PerfumeRepository.newId(),
+                        start.copy(
                             name = name.trim(),
                             brand = brand.trim(),
                             scentType = scent,
                             weather = weather,
                             photo = photo,
-                            sizeMl = (size.toIntOrNull() ?: 100).coerceAtLeast(1)
+                            sizeMl = (size.toIntOrNull() ?: 100).coerceAtLeast(1),
+                            topNotes = topNotes.trim(),
+                            heartNotes = heartNotes.trim(),
+                            baseNotes = baseNotes.trim()
                         )
                     )
                     Toast.makeText(context, R.string.toast_saved, Toast.LENGTH_SHORT).show()
