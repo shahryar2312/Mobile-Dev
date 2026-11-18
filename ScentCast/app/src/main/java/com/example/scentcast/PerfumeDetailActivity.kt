@@ -35,6 +35,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -119,7 +121,11 @@ fun PerfumeDetailScreen(perfume: Perfume, onBack: () -> Unit) {
             // ---- Accords chart ("scent map") ----
             if (perfume.accords.isNotEmpty()) {
                 SectionCard(stringResource(R.string.detail_accords)) {
-                    perfume.accords.forEach { (name, percent) -> AccordBar(name, percent) }
+                    // Strongest first, stacked tightly like the website chart.
+                    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        perfume.accords.sortedByDescending { it.second }
+                            .forEach { (name, percent) -> AccordBar(name, percent) }
+                    }
                 }
             }
 
@@ -233,28 +239,49 @@ private fun NoteLine(label: String, notes: String) {
     }
 }
 
-/** One accord: its name and a bar whose length is its strength. */
+/** Bar colours, picked to look like a fragrance website. Unknown accords get a grey-purple. */
+private fun accordColor(name: String): Color = when (name.lowercase()) {
+    "sweet" -> Color(0xFFEF3340)
+    "fruity" -> Color(0xFFDC4325)
+    "powdery" -> Color(0xFFB5ABA3)
+    "vanilla" -> Color(0xFFC5C593)
+    "musky", "musk" -> Color(0xFFA89FB0)
+    "yellow floral" -> Color(0xFFBBA010)
+    "woody" -> Color(0xFF5B3A1A)
+    "rose" -> Color(0xFFB00B52)
+    "floral" -> Color(0xFFA64360)
+    "citrus" -> Color(0xFFF9D308)
+    "fresh", "fresh spicy" -> Color(0xFF7CC242)
+    "aromatic" -> Color(0xFF48A07C)
+    "aquatic" -> Color(0xFF4C9FD6)
+    "amber" -> Color(0xFFC0521F)
+    "warm spicy" -> Color(0xFFB5381E)
+    "leather" -> Color(0xFF7B3F28)
+    "tobacco" -> Color(0xFF7A4B20)
+    else -> Color(0xFF8E8499)
+}
+
+/**
+ * One accord as a coloured bar with its name inside. The stronger the accord, the longer the
+ * bar. Bars never get shorter than 45% so the name always fits.
+ */
 @Composable
 private fun AccordBar(name: String, percent: Int) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    val color = accordColor(name)
+    val textColor = if (color.luminance() > 0.5f) Color.Black else Color.White
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(0.45f + 0.55f * percent.coerceIn(0, 100) / 100f)
+            .height(30.dp)
+            .clip(RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+            .background(color),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
-            text = name,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.width(110.dp)
+            text = name.lowercase(),
+            color = textColor,
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1
         )
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(12.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(percent.coerceIn(0, 100) / 100f)
-                    .background(MaterialTheme.colorScheme.primary)
-            )
-        }
     }
 }
