@@ -41,9 +41,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.scentcast.ui.theme.ScentCastTheme
@@ -61,10 +63,17 @@ class CollectionActivity : LoggedActivity() {
     }
 }
 
+/**
+ * Layout 2 of 3: a top bar, a row of filter chips and a two-column LazyVerticalGrid.
+ * The grid is lazy, so only the cards on screen are composed.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    // null means "All". The filter is saved across rotation.
+    // PerfumeRepository.perfumes is Compose state, so this screen redraws by itself
+    // when a perfume is added, edited or deleted on the form screen.
     var filter by rememberSaveable { mutableStateOf<ScentType?>(null) }
     val shown = PerfumeRepository.perfumes.filter { (_, _, _, scentType) ->
         (filter == null) || (scentType == filter)
@@ -99,6 +108,7 @@ fun CollectionScreen(onBack: () -> Unit) {
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
+            // User interaction: filter chips. The row scrolls sideways on narrow screens.
             Row(
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
@@ -119,6 +129,7 @@ fun CollectionScreen(onBack: () -> Unit) {
                 }
             }
 
+            // Empty state, so the user is told why the grid is blank.
             if (shown.isEmpty()) {
                 Text(
                     text = stringResource(R.string.collection_empty),
@@ -146,6 +157,37 @@ fun CollectionScreen(onBack: () -> Unit) {
     }
 }
 
+/**
+ * Picture for a perfume. The user's own photo comes first, then the bundled
+ * picture from res/drawable-nodpi, and the first letter of the name if there is neither.
+ * Call it inside a Box that centres its content.
+ */
+@Composable
+fun PerfumePicture(perfume: Perfume, modifier: Modifier = Modifier) {
+    when {
+        perfume.photo != null -> Image(
+            bitmap = perfume.photo.asImageBitmap(),
+            contentDescription = perfume.name,
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+        )
+
+        perfume.imageRes != null -> Image(
+            painter = painterResource(perfume.imageRes),
+            contentDescription = perfume.name,
+            contentScale = ContentScale.Fit,
+            // The bundled pictures have a white background, so the area behind them is white too.
+            modifier = modifier.background(Color.White).padding(8.dp)
+        )
+
+        else -> Text(
+            text = perfume.name.take(1).uppercase(),
+            style = MaterialTheme.typography.displayMedium
+        )
+    }
+}
+
+/** One cell of the grid: a square picture with the name, brand and scent type under it. */
 @Composable
 fun PerfumeCard(perfume: Perfume, onClick: () -> Unit) {
     Card(modifier = Modifier.clickable(onClick = onClick)) {
@@ -156,23 +198,14 @@ fun PerfumeCard(perfume: Perfume, onClick: () -> Unit) {
                 .background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center,
         ) {
-            if (perfume.photo != null) {
-                Image(
-                    bitmap = perfume.photo.asImageBitmap(),
-                    contentDescription = perfume.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                Text(
-                    text = perfume.name.take(1).uppercase(),
-                    style = MaterialTheme.typography.displayMedium,
-                )
-            }
+            PerfumePicture(perfume, Modifier.fillMaxSize())
         }
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = perfume.name, style = MaterialTheme.typography.titleMedium)
-            Text(text = perfume.brand, style = MaterialTheme.typography.bodyMedium)
+            // Brand is optional. Skipping the Text avoids an empty line on the card.
+            if (perfume.brand.isNotBlank()) {
+                Text(text = perfume.brand, style = MaterialTheme.typography.bodyMedium)
+            }
             Text(
                 text = stringResource(perfume.scentType.labelRes),
                 style = MaterialTheme.typography.labelMedium,

@@ -20,9 +20,12 @@ import androidx.core.content.ContextCompat
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -188,6 +191,10 @@ private fun timeOfDayFromClock(): TimeOfDay {
 private const val DARK_BELOW_LUX = 30f
 private const val BRIGHT_ABOVE_LUX = 80f
 
+/**
+ * A scrolling Column. Sensor values arrive as state, and the LaunchedEffects below
+ * turn each new reading into a new pick.
+ */
 @Composable
 fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeather: () -> Unit) {
     val context = LocalContext.current
@@ -195,6 +202,8 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
         ActivityResultContracts.RequestPermission()
     ) { }
 
+    // rememberSaveable keeps these values when the activity is recreated, for example on
+    // rotation. Only the id of the pick is saved, so the screen always shows the latest version.
     var weather by rememberSaveable { mutableStateOf(Weather.MILD) }
     var timeOfDay by rememberSaveable { mutableStateOf(timeOfDayFromClock()) }
     var pickId by rememberSaveable { mutableStateOf<Int?>(null) }
@@ -353,9 +362,20 @@ fun TodaysPickScreen(state: SensorState, hasLightSensor: Boolean, onRefreshWeath
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         } else {
+                            // Bottle picture: the user's photo, or the bundled picture.
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(160.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                PerfumePicture(pick, Modifier.fillMaxSize())
+                            }
                             Text(text = pick.name, style = MaterialTheme.typography.headlineSmall)
+                            // Brand is optional, so the separator is only shown when there is one.
+                            val scentLabel = stringResource(pick.scentType.labelRes)
                             Text(
-                                text = "${pick.brand} · ${stringResource(pick.scentType.labelRes)}",
+                                text = if (pick.brand.isBlank()) scentLabel else "${pick.brand} · $scentLabel",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             if (budget) {

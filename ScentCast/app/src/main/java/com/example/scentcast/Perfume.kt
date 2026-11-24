@@ -6,7 +6,10 @@ import androidx.compose.runtime.mutableStateListOf
 /** Set by the light sensor (or the clock if the phone has no light sensor). */
 enum class TimeOfDay { DAY, NIGHT }
 
-/** bestAt is the time of day this scent suits most, or null if it works at any time. */
+/**
+ * The four scent families. labelRes points at strings.xml, so no text is hard-coded here.
+ * bestAt is the time of day this scent suits most, or null if it works at any time.
+ */
 enum class ScentType(val labelRes: Int, val bestAt: TimeOfDay?) {
     FRESH(R.string.scent_fresh, TimeOfDay.DAY),
     WOODY(R.string.scent_woody, null),
@@ -32,13 +35,17 @@ enum class Weather(val labelRes: Int, val reasonRes: Int, val defaultSeasons: Se
 /** A cheaper perfume with a similar style. Prices are rough, in euro. */
 data class Dupe(val name: String, val brand: String, val priceEur: Int)
 
+/** One bottle in the collection. A data class, so two perfumes with the same values are equal. */
 data class Perfume(
     val id: Int,
     val name: String,
     val brand: String,
     val scentType: ScentType,
     val weather: Weather,
+    // A photo the user took or chose. It wins over the bundled picture.
     val photo: Bitmap? = null,
+    // A bundled picture from res/drawable-nodpi, used by the starter perfumes.
+    val imageRes: Int? = null,
     val sizeMl: Int = 100,
     val seasons: Set<Season> = weather.defaultSeasons,
     // Notes are comma separated text, so they are easy to type on the form.
@@ -75,6 +82,7 @@ object PerfumeRepository {
 
     val wears = mutableStateListOf<WearLog>()
 
+    // Ids for perfumes the user adds start at 100, so they never clash with the starter ids 1 to 6.
     private var nextId = 100
     private var nextWearId = 1
 
@@ -82,6 +90,7 @@ object PerfumeRepository {
 
     fun get(id: Int): Perfume? = perfumes.firstOrNull { it.id == id }
 
+    /** Replaces the perfume with the same id, or adds it if the id is new. */
     fun save(perfume: Perfume) {
         val index = perfumes.indexOfFirst { it.id == perfume.id }
         if (index >= 0) perfumes[index] = perfume else perfumes.add(perfume)

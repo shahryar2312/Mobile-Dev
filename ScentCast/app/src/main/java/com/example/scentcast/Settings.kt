@@ -51,6 +51,7 @@ object Settings {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit().putBoolean(KEY_DEMO, value).apply()
     }
 
+    // apply() writes to disk in the background, so the screen never waits for it.
     fun saveTheme(context: Context, value: Int) {
         theme = value
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit().putInt(KEY_THEME, value).apply()

@@ -8,6 +8,7 @@ package com.example.scentcast
 val starterPerfumes = listOf(
     Perfume(
         id = 1, name = "Sauvage", brand = "Dior",
+        imageRes = R.drawable.photo_sauvage,
         scentType = ScentType.SPICY, weather = Weather.COLD,
         seasons = setOf(Season.AUTUMN, Season.WINTER, Season.SPRING),
         topNotes = "Bergamot, Pepper",
@@ -21,6 +22,7 @@ val starterPerfumes = listOf(
     ),
     Perfume(
         id = 2, name = "Spicebomb", brand = "Viktor & Rolf",
+        imageRes = R.drawable.photo_spicebomb,
         scentType = ScentType.SPICY, weather = Weather.COLD,
         seasons = setOf(Season.AUTUMN, Season.WINTER),
         topNotes = "Bergamot, Grapefruit, Pink pepper",
@@ -34,6 +36,7 @@ val starterPerfumes = listOf(
     ),
     Perfume(
         id = 3, name = "Bleu de Chanel", brand = "Chanel",
+        imageRes = R.drawable.photo_bleu,
         scentType = ScentType.WOODY, weather = Weather.MILD,
         seasons = setOf(Season.SPRING, Season.AUTUMN),
         topNotes = "Grapefruit, Lemon, Mint",
@@ -47,6 +50,7 @@ val starterPerfumes = listOf(
     ),
     Perfume(
         id = 4, name = "1 Million", brand = "Paco Rabanne",
+        imageRes = R.drawable.photo_million,
         scentType = ScentType.SWEET, weather = Weather.MILD,
         seasons = setOf(Season.AUTUMN, Season.WINTER),
         topNotes = "Blood mandarin, Grapefruit, Mint",
@@ -60,6 +64,7 @@ val starterPerfumes = listOf(
     ),
     Perfume(
         id = 5, name = "Acqua di Gio", brand = "Armani",
+        imageRes = R.drawable.photo_acqua,
         scentType = ScentType.FRESH, weather = Weather.HOT,
         seasons = setOf(Season.SUMMER, Season.SPRING),
         topNotes = "Lime, Bergamot, Neroli",
@@ -73,6 +78,7 @@ val starterPerfumes = listOf(
     ),
     Perfume(
         id = 6, name = "Light Blue", brand = "Dolce & Gabbana",
+        imageRes = R.drawable.photo_lightblue,
         scentType = ScentType.FRESH, weather = Weather.HOT,
         seasons = setOf(Season.SUMMER),
         topNotes = "Sicilian lemon, Apple, Bellflower",

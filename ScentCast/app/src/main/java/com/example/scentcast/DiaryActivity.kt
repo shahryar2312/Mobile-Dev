@@ -45,6 +45,7 @@ class DiaryActivity : LoggedActivity() {
     }
 }
 
+/** A LazyColumn of wears, newest first. It reads PerfumeRepository.wears, so it updates on its own. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryScreen(onBack: () -> Unit) {
@@ -88,6 +89,7 @@ fun DiaryScreen(onBack: () -> Unit) {
     }
 }
 
+/** One diary entry with five rating chips. Tapping a chip saves the rating straight away. */
 @Composable
 fun WearCard(wear: WearLog) {
     val context = LocalContext.current

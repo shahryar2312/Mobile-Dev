@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -94,6 +95,15 @@ fun PerfumeDetailScreen(perfume: Perfume, onBack: () -> Unit) {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Bottle picture at the top, like a fragrance website.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                PerfumePicture(perfume, Modifier.fillMaxSize())
+            }
             Text(perfume.name, style = MaterialTheme.typography.headlineMedium)
             Text(
                 text = "${perfume.brand} · ${stringResource(perfume.scentType.labelRes)}",

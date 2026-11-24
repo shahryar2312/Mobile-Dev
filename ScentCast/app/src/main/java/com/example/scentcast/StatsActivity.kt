@@ -45,6 +45,7 @@ class StatsActivity : LoggedActivity() {
     }
 }
 
+/** Stats at the top, settings underneath. Each setting is saved the moment it changes. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(onBack: () -> Unit) {
@@ -189,6 +190,7 @@ fun StatsScreen(onBack: () -> Unit) {
     }
 }
 
+/** One theme option. Saving changes Settings.theme, which every open screen reads. */
 @Composable
 private fun ThemeChip(context: Context, value: Int, labelRes: Int) {
     FilterChip(
