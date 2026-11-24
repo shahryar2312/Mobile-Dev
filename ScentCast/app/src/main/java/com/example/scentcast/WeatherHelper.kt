@@ -78,8 +78,9 @@ class WeatherHelper(private val context: Context) {
             return
         }
 
-        // A remembered position is good enough for weather.
-        val remembered = enabled.firstNotNullOfOrNull { manager.getLastKnownLocation(it) }
+        // A remembered position is good enough for weather. Take the newest one, since
+        // each provider keeps its own and one can be hours old.
+        val remembered = enabled.mapNotNull { manager.getLastKnownLocation(it) }.maxByOrNull { it.time }
         if (remembered != null) {
             onFound(remembered)
             return
