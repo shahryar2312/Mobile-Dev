@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +60,8 @@ class PerfumeDetailActivity : LoggedActivity() {
                 // Read inside setContent, so the page updates after coming back from Edit.
                 val perfume = PerfumeRepository.get(perfumeId)
                 if (perfume == null) {
-                    finish()
+                    // Deleted from Edit: close after drawing, not during it.
+                    LaunchedEffect(Unit) { finish() }
                 } else {
                     PerfumeDetailScreen(perfume) { finish() }
                 }

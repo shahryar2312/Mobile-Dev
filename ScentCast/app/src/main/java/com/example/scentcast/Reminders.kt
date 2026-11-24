@@ -48,7 +48,7 @@ object Reminders {
         }
     }
 
-    fun show(context: Context, name: String, hours: Int, demo: Boolean) {
+    fun show(context: Context, wearId: Int, name: String, hours: Int, demo: Boolean) {
         val canNotify = Build.VERSION.SDK_INT < 33 ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
@@ -81,13 +81,16 @@ object Reminders {
             .setContentIntent(open)
             .setAutoCancel(true)
             .build()
-        manager.notify(name.hashCode() + hours, notification)
+        manager.notify(wearId * 10 + hours, notification) // one per wear and per reminder
     }
 }
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val name = intent.getStringExtra("name") ?: return
-        Reminders.show(context, name, intent.getIntExtra("hours", 1), intent.getBooleanExtra("demo", false))
+        Reminders.show(
+            context, intent.getIntExtra("wearId", 0), name,
+            intent.getIntExtra("hours", 1), intent.getBooleanExtra("demo", false)
+        )
     }
 }

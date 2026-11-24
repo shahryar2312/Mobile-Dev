@@ -105,8 +105,10 @@ class MainActivity : LoggedActivity(), SensorEventListener {
             }
         }
 
-        // Ask for the weather once when the app opens (not again after a rotation).
+        // First open: ask for permission if needed. After a rotation SensorState is new and
+        // empty, so reload quietly, but only if permission was already given.
         if (savedInstanceState == null) requestWeather()
+        else if (weatherHelper.hasPermission()) loadWeather()
     }
 
     private fun requestWeather() {
