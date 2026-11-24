@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.scentcast.ui.theme.ScentCastTheme
@@ -128,7 +129,7 @@ fun StatsScreen(onBack: () -> Unit) {
                         Text(
                             stringResource(
                                 R.string.stats_row,
-                                PerfumeRepository.wearCount(perfume.id),
+                                pluralStringResource(R.plurals.wear_count, PerfumeRepository.wearCount(perfume.id), PerfumeRepository.wearCount(perfume.id)),
                                 longevity,
                                 PerfumeRepository.mlLeft(perfume),
                                 perfume.sizeMl

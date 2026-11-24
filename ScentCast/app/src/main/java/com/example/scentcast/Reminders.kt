@@ -32,6 +32,7 @@ object Reminders {
                 .putExtra("wearId", wear.id)
                 .putExtra("name", wear.perfumeName)
                 .putExtra("hours", hours)
+                .putExtra("demo", Settings.demoReminders) // the receiver may run in a fresh process
             val pending = PendingIntent.getBroadcast(
                 context,
                 wear.id * 10 + hours, // unique per wear and per reminder
@@ -47,7 +48,7 @@ object Reminders {
         }
     }
 
-    fun show(context: Context, name: String, hours: Int) {
+    fun show(context: Context, name: String, hours: Int, demo: Boolean) {
         val canNotify = Build.VERSION.SDK_INT < 33 ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
@@ -69,7 +70,14 @@ object Reminders {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(context.getString(R.string.reminder_title, name))
-            .setContentText(context.getString(R.string.reminder_text, hours))
+            .setContentText(
+                context.getString(
+                    R.string.reminder_text,
+                    context.resources.getQuantityString(
+                        if (demo) R.plurals.minute_count else R.plurals.hour_count, hours, hours
+                    )
+                )
+            )
             .setContentIntent(open)
             .setAutoCancel(true)
             .build()
@@ -80,6 +88,6 @@ object Reminders {
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val name = intent.getStringExtra("name") ?: return
-        Reminders.show(context, name, intent.getIntExtra("hours", 1))
+        Reminders.show(context, name, intent.getIntExtra("hours", 1), intent.getBooleanExtra("demo", false))
     }
 }

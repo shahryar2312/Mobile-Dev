@@ -99,7 +99,7 @@
     <string name="stats_most">Most worn: %1$s (%2$d)</string>
     <string name="stats_least">Least worn: %1$s (%2$d)</string>
     <string name="stats_not_rated">not rated</string>
-    <string name="stats_row">%1$d wears · longevity %2$s · about %3$.1f of %4$d ml left</string>
+    <string name="stats_row">%1$s · longevity %2$s · about %3$.1f of %4$d ml left</string>
     <string name="settings_heading">Settings</string>
     <string name="settings_theme">Theme</string>
     <string name="theme_system">System</string>
@@ -110,7 +110,7 @@
     <string name="settings_demo">Demo mode: minutes instead of hours</string>
     <string name="channel_name">Longevity reminders</string>
     <string name="reminder_title">How strong is %1$s now?</string>
-    <string name="reminder_text">%1$d hour(s) after you put it on. Tap to rate it from 1 to 5.</string>
+    <string name="reminder_text">%1$s after you put it on. Tap to rate it from 1 to 5.</string>
     <string name="field_size">Bottle size (ml)</string>
 
     <!-- Collection -->
@@ -136,4 +136,16 @@
     <string name="btn_delete">Delete</string>
     <string name="toast_saved">Saved</string>
     <string name="toast_deleted">Deleted</string>
+    <plurals name="wear_count">
+        <item quantity="one">%d wear</item>
+        <item quantity="other">%d wears</item>
+    </plurals>
+    <plurals name="hour_count">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="minute_count">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
 </resources>
